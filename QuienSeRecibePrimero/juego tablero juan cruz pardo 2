@@ -1,0 +1,126 @@
+import random
+import os
+
+def limpiar():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+# Materias complicadas (trampas)
+trampas = [3, 5, 7, 9, 10]
+
+# Lista de materias por casilla
+materias = {
+    1: "Programación 1",
+    2: "Programación 2",
+    3: "Inglés",
+    4: "Matemática",
+    5: "Base de Datos",
+    6: "Arquitectura en Sistemas Operativos",
+    7: "Organización Empresarial",
+    8: "Análisis y Probabilidad",
+    9: "Inglés 2",
+    10: "Base de Datos 2"
+}
+
+print("🎓 Bienvenido a '¿Quién se recibe primero?'")
+print("¡Compite por ver quién cursa todas las materias y se recibe primero!\n")
+
+jug1 = input("Nombre del estudiante 1: ")
+jug2 = input("Nombre del estudiante 2: ")
+
+emoji1 = "🧑‍🎓"
+emoji2 = "👩‍🎓"
+
+# Ahora comienzan desde "Inicio" (casilla 0)
+pos1 = 0
+pos2 = 0
+pierde_turno_1 = False
+pierde_turno_2 = False
+turno = 1
+
+# Decidir quién empieza
+print("\n🎲 Tirando dados para ver quién empieza...")
+while True:
+    d1 = random.randint(1, 6)
+    d2 = random.randint(1, 6)
+    print(f"{jug1} {emoji1} sacó {d1}")
+    print(f"{jug2} {emoji2} sacó {d2}")
+    if d1 != d2:
+        turno = 1 if d1 > d2 else 2
+        print(f"Empieza {'{0} {1}'.format(jug1, emoji1) if turno == 1 else '{0} {1}'.format(jug2, emoji2)}")
+        break
+    print("Empate, se vuelve a tirar...\n")
+
+# Mostrar tablero completo desde Inicio
+def mostrar_tablero(p1, p2):
+    print("\n📚 Plan de estudios (de abajo hacia arriba):")
+    
+    # Mostrar casilla de inicio
+    contenido_inicio = ""
+    if p1 == 0:
+        contenido_inicio += emoji1 + " "
+    if p2 == 0:
+        contenido_inicio += emoji2 + " "
+    print(f"Inicio (Casilla 0): [{contenido_inicio.strip()}]")
+
+    # Mostrar materias desde la 1 a la 10
+    for i in range(1, 11):
+        nombre = materias.get(i, f"Materia {i}")
+        contenido = ""
+        if i in trampas:
+            contenido += "📉 "
+        if i == p1:
+            contenido += emoji1 + " "
+        if i == p2:
+            contenido += emoji2 + " "
+        print(f"{nombre} (Casilla {i}): [{contenido.strip()}]")
+    print("-" * 40)
+
+# Bucle principal del juego
+while True:
+    if turno == 1:
+        if pierde_turno_1:
+            print(f"\n⛔ {jug1} pierde este turno por una materia complicada.")
+            pierde_turno_1 = False
+            turno = 2
+            continue
+
+        input(f"\nTurno de {jug1} (ENTER para rendir)...")
+        limpiar()
+        dado = random.randint(1, 6)
+        print(f"{jug1} {emoji1} cursó {dado} materias 📚")
+        pos1 += dado
+        pos1 = min(pos1, 10)
+
+        if pos1 in trampas:
+            print("⚠️ Materia complicada. Perdés el próximo turno.")
+            pierde_turno_1 = True
+
+        mostrar_tablero(pos1, pos2)
+        if pos1 >= 10:
+            print(f"\n🎉 ¡{jug1} {emoji1} se recibió y obtuvo el título universitario! 🏆🎓")
+            break
+        turno = 2
+
+    else:
+        if pierde_turno_2:
+            print(f"\n⛔ {jug2} pierde este turno por una materia complicada.")
+            pierde_turno_2 = False
+            turno = 1
+            continue
+
+        input(f"\nTurno de {jug2} (ENTER para rendir)...")
+        limpiar()
+        dado = random.randint(1, 6)
+        print(f"{jug2} {emoji2} cursó {dado} materias 📚")
+        pos2 += dado
+        pos2 = min(pos2, 10)
+
+        if pos2 in trampas:
+            print("⚠️ Materia complicada. Perdés el próximo turno.")
+            pierde_turno_2 = True
+
+        mostrar_tablero(pos1, pos2)
+        if pos2 >= 10:
+            print(f"\n🎉 ¡{jug2} {emoji2} se recibió y obtuvo el título universitario! 🏆🎓")
+            break
+        turno = 1
